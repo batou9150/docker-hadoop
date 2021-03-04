@@ -1,0 +1,8 @@
+[template]
+src = "livy.conf"
+dest = "/etc/livy/livy.conf"
+owner = "root"
+mode = "0755"
+keys = [
+    "/services"
+]

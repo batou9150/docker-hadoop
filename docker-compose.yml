@@ -1,0 +1,243 @@
+version: '3.4'
+
+services:
+
+  livy:
+    image: batou9150/livy
+    ports:
+    - "8998:8998"
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    - CONF_YARN_yarn_resourcemanager_hostname=resourcemanager
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://livy:8998/ui"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+## Oozie - Hue
+
+  oozie:
+    image: batou9150/oozie
+    hostname: oozie
+    ports:
+    - "11000:11000" # oozie.http.port
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    - CONF_YARN_yarn_resourcemanager_hostname=resourcemanager
+    - CONF_OOZIE_oozie_base_url=http://oozie:11000/oozie
+    - CONF_OOZIE_oozie_service_ProxyUserService_proxyuser_hue_groups=*
+    - CONF_OOZIE_oozie_service_ProxyUserService_proxyuser_hue_hosts=*
+    - CONF_HIVE_hive_metastore_uris=thrift://metastore:9083
+    - CONF_HIVE_hive_metastore_warehouse_dir=/user/hive/warehouse
+    - CONF_HIVE_hive_server2_thrift_bind_host=hiveserver2
+    - CONF_HIVE_hive_server2_thrift_port=10000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://oozie:11000/oozie"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+  hue:
+    image: batou9150/hue:4.7.0
+    ports:
+    - "8888:8888"
+    environment:
+    - CONFIG_HUE_APP_BLACKLIST=search,impala,security,rdbms,pig,hbase,sqoop,zookeeper
+    - CONFIG_HDFS_DEFAULTFS=hdfs://namenode:8020
+    - CONFIG_HDFS_WEBHDFS=http://namenode:50070/webhdfs/v1
+    - CONFIG_YARN_HOST=resourcemanager
+    - CONFIG_YARN_PORT=8032
+    - CONFIG_YARN_API=http://resourcemanager:8088
+    - CONFIG_YARN_PROXI_API=http://resourcemanager:8088
+    - CONFIG_LIVY_HOST=livy
+    - CONFIG_LIVY_PORT=8998
+    - CONFIG_HIVE_HOST=hiveserver2
+    - CONFIG_HIVE_PORT=10000
+    - CONFIG_OOZIE_URL=http://oozie:11000/oozie
+    - CONFIG_OOZIE_REMOTE_DEPLOYEMENT_DIR=/user/hue/oozie/deployments
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://hue:8888/hue"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+## HDFS
+
+  namenode:
+    image: batou9150/hadoop
+    command: ["hdfs", "namenode"]
+    hostname: namenode
+    ports:
+    - "8020:8020" # fs.default.name
+    - "50070:50070" # dfs.namenode.http-address
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    - CONF_CORE_hadoop_proxyuser_hdfs_groups=*
+    - CONF_CORE_hadoop_proxyuser_hdfs_hosts=*
+    - CONF_CORE_hadoop_proxyuser_hue_groups=*
+    - CONF_CORE_hadoop_proxyuser_hue_hosts=*
+    - CONF_HDFS_dfs_namenode_http___bind___host=0.0.0.0
+    - CONF_HDFS_dfs_namenode_https___bind___host=0.0.0.0
+    - CONF_HDFS_dfs_namenode_rpc___bind___host=0.0.0.0
+    - CONF_HDFS_dfs_namenode_servicerpc___bind___host=0.0.0.0
+    - CONF_HDFS_dfs_client_use_datanode_hostname=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://namenode:50070/logs"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+  datanode:
+    image: batou9150/hadoop
+    command: ["hdfs", "datanode"]
+    hostname: datanode
+    ports:
+    - "50010:50010" # dfs.datanode.address
+    - "50020:50020" # dfs.datanode.ipc.address
+    - "50075:50075" # dfs.datanode.http.address
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://datanode:50075/logs"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+## YARN
+
+  resourcemanager:
+    image: batou9150/hadoop
+    command: ["yarn", "resourcemanager"]
+    hostname: resourcemanager
+    ports:
+    - "8030:8030" # yarn.resourcemanager.scheduler.address
+    - "8031:8031" # yarn.resourcemanager.resource-tracker.address
+    - "8032:8032" # yarn.resourcemanager.address
+    - "8033:8033" # yarn.resourcemanager.admin.address
+    - "8088:8088" # yarn.resourcemanager.webapp.address
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    - CONF_CORE_hadoop_proxyuser_hdfs_groups=*
+    - CONF_CORE_hadoop_proxyuser_hdfs_hosts=*
+    - CONF_CORE_hadoop_proxyuser_hue_groups=*
+    - CONF_CORE_hadoop_proxyuser_hue_hosts=*
+    # TIMELINE SERVER
+    - CONF_YARN_yarn_timeline___service_enabled=true
+    - CONF_YARN_yarn_timeline___service_hostname=timelineserver
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://resourcemanager:8088/logs/"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+  nodemanager:
+    image: batou9150/hadoop
+    command: ["yarn", "nodemanager"]
+    hostname: nodemanager
+    ports:
+    - "7337:7337" # spark.shuffle.service.port
+    - "8040:8040" # yarn.nodemanager.localizer.address
+    - "8041:8041" # yarn.nodemanager.address
+    - "8042:8042" # yarn.nodemanager.webapp.address
+    - "8048:8048" # yarn.nodemanager.collector-service.address
+    - "4040-4049:4040-4049" # for spark driver web ui
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    - CONF_YARN_yarn_resourcemanager_hostname=resourcemanager
+    - CONF_YARN_yarn_nodemanager_pmem___check___enabled=false
+    - CONF_YARN_yarn_nodemanager_vmem___check___enabled=false
+    - CONF_YARN_yarn_nodemanager_aux___services=spark_shuffle,mapreduce_shuffle
+    - CONF_YARN_yarn_nodemanager_aux___services_mapreduce__shuffle_class=org.apache.hadoop.mapred.ShuffleHandler
+    - CONF_YARN_yarn_nodemanager_aux___services_spark__shuffle_class=org.apache.spark.network.yarn.YarnShuffleService
+    - CONF_YARN_yarn_nodemanager_log_retain___seconds=604800 # 7 jours
+    # TIMELINE SERVER
+    - CONF_YARN_yarn_timeline___service_enabled=true
+    - CONF_YARN_yarn_timeline___service_hostname=timelineserver
+    # HIVE SERVER
+    - CONF_SPARK_hive_metastore_uris=thrift://metastore:9083
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://nodemanager:8042/logs/"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+  timelineserver:
+    image: batou9150/hadoop
+    command: ["yarn", "timelineserver"]
+    hostname: timelineserver
+    ports:
+    - "8188:8188" # yarn.timeline-service.webapp.address
+    - "10200:10200" # yarn.timeline-service.address
+    environment:
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://timelineserver:8188/logs/"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+## Spark History
+
+  spark_history:
+    image: batou9150/spark
+    command: ["spark", "historyserver"]
+    ports:
+    - "18080:18080"
+    environment:
+    - CONF_SPARK_spark_history_fs_logDirectory=hdfs://namenode:8020/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://spark_history:18080"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+## Hive
+
+  metastore:
+    image: batou9150/hive
+    command: ["hive", "metastore"]
+    hostname: metastore
+    ports:
+    - "9083:9083" # hive.metastore.port
+    environment:
+    - CONF_HIVE_hive_metastore_uris=thrift://metastore:9083
+    - CONF_HIVE_hive_metastore_warehouse_dir=/user/hive/warehouse
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+
+  hiveserver2:
+    image: batou9150/hive
+    command: ["hive", "hiveserver2"]
+    hostname: hiveserver2
+    ports:
+    - "10000:10000" # hive.server2.thrift.port
+    - "10002:10002" # hive.server2.webui.port
+    environment:
+    - CONF_HIVE_hive_metastore_uris=thrift://metastore:9083
+    - CONF_HIVE_hive_server2_thrift_port=10000
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://hiveserver2:10002/logs"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
+## Kylin
+
+  kylin:
+    image: batou9150/kylin
+    command: ["start"]
+    hostname: kylin
+    ports:
+    - "7070:7070" # 
+    environment:
+    - CONF_HIVE_hive_metastore_uris=thrift://metastore:9083
+    - CONF_HIVE_hive_server2_thrift_port=10000
+    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
+    - CONF_YARN_yarn_resourcemanager_hostname=resourcemanager
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://kylin:7070/kylin"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+
