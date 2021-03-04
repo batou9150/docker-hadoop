@@ -5,8 +5,7 @@ RUN apt-get update && apt-get install -y wget curl
 # Installing confd
 RUN wget -nv https://github.com/kelseyhightower/confd/releases/download/v0.16.0/confd-0.16.0-linux-amd64 -O /bin/confd \
   && chmod a+x /bin/confd
-ADD config/conf.d/* /etc/confd/conf.d/
-ADD config/templates/* /etc/confd/templates/
+ADD config/ /etc/confd/
 
 ADD functions.sh /functions.sh
 RUN chmod a+x /functions.sh

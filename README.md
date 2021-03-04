@@ -2,10 +2,10 @@
 
 ## Versions
 
-### Hadoop - 2.9.2 (stable)
+### Hadoop - 2.10.1 (stable)
 hdfs + yarn
 
-### Spark - 2.4.4 (latest)
+### Spark - 2.4.7 (latest)
 
 Basic
 ```bash

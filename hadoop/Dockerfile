@@ -5,7 +5,7 @@ RUN apt-get install -y bc procps
 ARG MIRROR=apache.crihan.fr/dist
 
 # Installing Hadoop (HDFS + Mapred + Yarn)
-ENV HADOOP_VERSION=2.9.2
+ENV HADOOP_VERSION=2.10.1
 ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop
 ENV LD_LIBRARY_PATH=$HADOOP_HOME/lib/native/:$LD_LIBRARY_PATH
@@ -19,7 +19,7 @@ RUN wget -nv http://${MIRROR}/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HA
     && mkdir -p /hadoop/dfs/data
 
 # Spark shuffle for YARN
-ENV SPARK_VERSION=2.4.4
+ENV SPARK_VERSION=2.4.7
 ARG SPARK_YARN_SHUFFLE=spark-${SPARK_VERSION}-bin-hadoop2.7/yarn/spark-${SPARK_VERSION}-yarn-shuffle.jar
 RUN wget -nv http://${MIRROR}/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz -O /tmp/spark.tar.gz \
     && tar -xvf /tmp/spark.tar.gz $SPARK_YARN_SHUFFLE \
