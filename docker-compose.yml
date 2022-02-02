@@ -221,23 +221,3 @@ services:
       interval: 10m
       timeout: 10s
       retries: 3
-
-## Kylin
-
-  kylin:
-    image: batou9150/kylin
-    command: ["start"]
-    hostname: kylin
-    ports:
-    - "7070:7070" # 
-    environment:
-    - CONF_HIVE_hive_metastore_uris=thrift://metastore:9083
-    - CONF_HIVE_hive_server2_thrift_port=10000
-    - CONF_CORE_fs_defaultFS=hdfs://namenode:8020
-    - CONF_YARN_yarn_resourcemanager_hostname=resourcemanager
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://kylin:7070/kylin"]
-      interval: 10m
-      timeout: 10s
-      retries: 3
-

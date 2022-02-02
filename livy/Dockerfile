@@ -5,7 +5,7 @@ RUN apt-get install -y unzip
 ARG MIRROR=archive.apache.org/dist
 
 # Installing Spark
-ENV SPARK_VERSION=2.4.7
+ENV SPARK_VERSION=2.4.8
 ENV SPARK_URL=http://${MIRROR}/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz
 ENV SPARK_HOME=/opt/spark-$SPARK_VERSION
 RUN wget -nv "$SPARK_URL" -O /tmp/spark.tar.gz \
@@ -14,7 +14,7 @@ RUN wget -nv "$SPARK_URL" -O /tmp/spark.tar.gz \
     && rm -f /tmp/spark.tar.gz
 
 # Installing Livy
-ENV LIVY_VERSION=0.7.0-incubating
+ENV LIVY_VERSION=0.7.1-incubating
 
 ENV LIVY_URL=http://${MIRROR}/incubator/livy/${LIVY_VERSION}/apache-livy-${LIVY_VERSION}-bin.zip
 ENV LIVY_HOME=/opt/livy-$LIVY_VERSION

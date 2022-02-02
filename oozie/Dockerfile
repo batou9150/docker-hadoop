@@ -1,6 +1,6 @@
 FROM maven:3-jdk-8-slim AS builder
 
-ENV OOZIE_VERSION=5.1.0
+ENV OOZIE_VERSION=5.2.1
 ADD http://apache.crihan.fr/dist/oozie/$OOZIE_VERSION/oozie-$OOZIE_VERSION.tar.gz /tmp/oozie.tar.gz
 RUN tar -xvf /tmp/oozie.tar.gz  -C /tmp \
     && rm /tmp/oozie.tar.gz*  \
@@ -12,7 +12,7 @@ RUN tar -xvf /tmp/oozie.tar.gz  -C /tmp \
 
 FROM batou9150/spark
 
-ENV OOZIE_VERSION=5.1.0
+ENV OOZIE_VERSION=5.2.1
 ENV OOZIE_HOME=/opt/oozie-${OOZIE_VERSION}
 ENV PATH=$PATH:${OOZIE_HOME}/bin
 

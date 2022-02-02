@@ -19,7 +19,7 @@ RUN wget -nv http://${MIRROR}/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HA
     && mkdir -p /hadoop/dfs/data
 
 # Spark shuffle for YARN
-ENV SPARK_VERSION=2.4.7
+ENV SPARK_VERSION=2.4.8
 ARG SPARK_YARN_SHUFFLE=spark-${SPARK_VERSION}-bin-hadoop2.7/yarn/spark-${SPARK_VERSION}-yarn-shuffle.jar
 RUN wget -nv http://${MIRROR}/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz -O /tmp/spark.tar.gz \
     && tar -xvf /tmp/spark.tar.gz $SPARK_YARN_SHUFFLE \

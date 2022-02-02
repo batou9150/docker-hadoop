@@ -5,7 +5,7 @@
 ### Hadoop - 2.10.1 (stable)
 hdfs + yarn
 
-### Spark - 2.4.7 (latest)
+### Spark - 2.4.8 (latest)
 
 Basic
 ```bash
@@ -35,27 +35,17 @@ docker run -it --rm --net=hadoop_default \
   batou9150/spark spark prepareyarn
 ```
 
-### Hive - 2.3.6
+### Hive - 2.3.8
 
 * Java 1.7 or 1.8
 * Hadoop 1.x, 2.x, 3.x (3.x required for Hive 3.x)
 
-### Oozie - 5.1.0
+### Oozie - 5.2.1
 
 * Unix (tested in Linux and Mac OS X)
 * Java 1.8+
 * Hadoop (tested with 1.2.1 & 2.6.0+) (Support for Hadoop 3 might come in 5.2.0 - dependencies with Hive and Pig)
 * ExtJS  2.2 library (optional, to enable Oozie webconsole)
-
-### Kylin - 2.6.4
-
-* Hadoop: 2.7+, 3.1+ (since v2.5)
-* Hive: 0.13 - 1.2.1+
-* HBase: 1.1+, 2.0 (since v2.5)
-* Spark (optional) 2.3.0+
-* Kafka (optional) 1.0.0+ (since v2.5)
-* JDK: 1.8+ (since v2.5)
-* OS: Linux only, CentOS 6.5+ or Ubuntu 16.0.4+
 
 ## Usage with Docker
 

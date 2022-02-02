@@ -4,7 +4,7 @@ ARG MIRROR=archive.apache.org/dist
 
 # Installing Hive
 
-ENV HIVE_VERSION=2.3.6
+ENV HIVE_VERSION=2.3.8
 ENV HIVE_HOME=/opt/hive-$HIVE_VERSION
 ENV HIVE_LIB=$HIVE_HOME/lib
 ENV HCAT_HOME=$HIVE_HOME/hcatalog
