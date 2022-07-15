@@ -6,6 +6,7 @@ Livy
 * `CONFIG_LIVY_BIND_HOST` : Server listens on this address. (default "0.0.0.0")
 * `CONFIG_LIVY_PORT` : Server listens on this port. (default "8998")
 * `CONFIG_LIVY_BASEPATH` : Base path ui should work on. (default "/")
+* `CONFIG_LIVY_CACHE_LOG_SIZE` : Logs size livy can cache for each session/batch. (default "200")
 * `CONFIG_LIVY_ENABLE_HIVE_CONTEXT` : Whether to enable HiveContext in livy interpreter (default "false")
 * `CONFIG_LIVY_LOCAL_DIR_WHITELIST` :  List of local directories from where files are allowed to be added to user sessions. (Optional)
 
