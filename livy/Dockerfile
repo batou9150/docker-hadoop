@@ -5,8 +5,9 @@ RUN apt-get install -y unzip
 ARG MIRROR=archive.apache.org/dist
 
 # Installing Spark
-ENV SPARK_VERSION=2.4.8
-ENV SPARK_URL=http://${MIRROR}/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz
+ARG SPARK_VERSION=2.4.8
+ARG HADOOP_COMPAT_VERSION=2.7
+ENV SPARK_URL=http://${MIRROR}/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_COMPAT_VERSION}.tgz
 ENV SPARK_HOME=/opt/spark-$SPARK_VERSION
 RUN wget -nv "$SPARK_URL" -O /tmp/spark.tar.gz \
     && tar -xvf /tmp/spark.tar.gz -C /opt \
